@@ -19,6 +19,7 @@ def scrape_data(url):
         year = columns[4].get_text().strip()
         publisher = columns[3].get_text().strip()
         data.append({'Title': title, 'Author': author, 'Year': year,'Publisher': publisher})
+        data.append({'Title': title, 'Author': author, 'Year': year,'Publisher': publisher})
         
     return data
 
