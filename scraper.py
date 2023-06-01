@@ -2,31 +2,22 @@ import requests
 from bs4 import BeautifulSoup
 import streamlit as st
 
-# Define the URL
-url = "https://libgen.is/search.php?req=islamic&lg_topic=libgen&open=0&view=simple&res=25&phrase=1&column=def"
+# Define the URL to scrape
+url = 'https://libgen.is/book/index.php?md5=EDA14ED128C9EF556F0D60B270E706D4'
 
-# Make a GET request to the URL
+# Make a request to the URL
 response = requests.get(url)
 
 # Parse the HTML content using BeautifulSoup
-soup = BeautifulSoup(response.content, "html.parser")
+soup = BeautifulSoup(response.content, 'html.parser')
 
-# Find all table rows in the HTML
-table_rows = soup.find_all("tr")
+# Find the book details on the page
+title = soup.select_one('#main > table.c > tr:nth-child(2) > td:nth-child(2)').text
+author = soup.select_one('#main > table.c > tr:nth-child(3) > td:nth-child(2)').text
+year = soup.select_one('#main > table.c > tr:nth-child(5) > td:nth-child(2)').text
 
-# Define a list to store the scraped data
-data = []
-
-# Extract the data from each table row
-for row in table_rows:
-    columns = row.find_all("td")
-    if len(columns) >= 4:
-        book_title = columns[1].text.strip()
-        author = columns[2].text.strip()
-        year = columns[3].text.strip()
-        data.append({"Title": book_title, "Author": author, "Year": year})
-
-# Create a Streamlit app to display the scraped data
-st.title("Web Data Scraper")
-st.header("Scraped Data")
-st.table(data)
+# Display the scraped data using Streamlit
+st.title("Book Details")
+st.write(f"Title: {title}")
+st.write(f"Author: {author}")
+st.write(f"Year: {year}")
