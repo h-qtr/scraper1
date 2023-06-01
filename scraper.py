@@ -2,29 +2,31 @@ import requests
 from bs4 import BeautifulSoup
 import streamlit as st
 
-# Function to scrape data from the URL
 def scrape_data(url):
+    # Send a GET request to the URL
     response = requests.get(url)
+    # Create a BeautifulSoup object with the response content
     soup = BeautifulSoup(response.content, 'html.parser')
-    
-    # Extracting the title
-    title = soup.find('h1', {'class': 'headline'}).text.strip()
-    
-    # Extracting the article content
-    article = soup.find('div', {'class': 'article-body'})
-    paragraphs = article.find_all('p')
-    content = '\n'.join([p.text for p in paragraphs])
-    
-    return title, content
+    # Find the table element with the search results
+    table = soup.find('table', {'class': 'c'})
+    # Extract data from the table
+    data = []
+    rows = table.find_all('tr')
+    for row in rows[1:]:  # Exclude the header row
+        columns = row.find_all('td')
+        title = columns[2].get_text().strip()
+        author = columns[1].get_text().strip()
+        year = columns[3].get_text().strip()
+        data.append({'Title': title, 'Author': author, 'Year': year})
+    return data
 
-# Streamlit web application
-def main():
-    st.title("Web Data Scraper")
-    url = st.text_input("Enter URL", "https://www.foxnews.com/politics/house-passes-mccarthy-biden-debt-ceiling-deal-sends-senate-five-days-funding-crunch")
-    if st.button("Scrape"):
-        title, content = scrape_data(url)
-        st.subheader(title)
-        st.write(content)
+# Set up the Streamlit app
+st.title('Web Data Scraper')
+url = 'https://libgen.is/search.php?req=topicid69&open=0&column=topic'
+data = scrape_data(url)
+# Display the scraped data
+if data:
+    st.table(data)
+else:
+    st.write('No data found.')
 
-if __name__ == '__main__':
-    main()
