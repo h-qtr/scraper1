@@ -18,6 +18,7 @@ def scrape_data(url):
         author = columns[1].get_text().strip()
         year = columns[3].get_text().strip()
         data.append({'Title': title, 'Author': author, 'Year': year})
+        data.append({'Title': title, 'Author': author, 'Year': year})
     return data
 
 # Set up the Streamlit app
