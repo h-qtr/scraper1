@@ -2,22 +2,29 @@ import requests
 from bs4 import BeautifulSoup
 import streamlit as st
 
-# Define the URL to scrape
-url = 'https://libgen.is/book/index.php?md5=EDA14ED128C9EF556F0D60B270E706D4'
+# Function to scrape data from the URL
+def scrape_data(url):
+    response = requests.get(url)
+    soup = BeautifulSoup(response.content, 'html.parser')
+    
+    # Extracting the title
+    title = soup.find('h1', {'class': 'headline'}).text.strip()
+    
+    # Extracting the article content
+    article = soup.find('div', {'class': 'article-body'})
+    paragraphs = article.find_all('p')
+    content = '\n'.join([p.text for p in paragraphs])
+    
+    return title, content
 
-# Make a request to the URL
-response = requests.get(url)
+# Streamlit web application
+def main():
+    st.title("Web Data Scraper")
+    url = st.text_input("Enter URL", "https://www.foxnews.com/politics/house-passes-mccarthy-biden-debt-ceiling-deal-sends-senate-five-days-funding-crunch")
+    if st.button("Scrape"):
+        title, content = scrape_data(url)
+        st.subheader(title)
+        st.write(content)
 
-# Parse the HTML content using BeautifulSoup
-soup = BeautifulSoup(response.content, 'html.parser')
-
-# Find the book details on the page
-title = soup.select_one('#main > table.c > tr:nth-child(2) > td:nth-child(2)').text
-author = soup.select_one('#main > table.c > tr:nth-child(3) > td:nth-child(2)').text
-year = soup.select_one('#main > table.c > tr:nth-child(5) > td:nth-child(2)').text
-
-# Display the scraped data using Streamlit
-st.title("Book Details")
-st.write(f"Title: {title}")
-st.write(f"Author: {author}")
-st.write(f"Year: {year}")
+if __name__ == '__main__':
+    main()
