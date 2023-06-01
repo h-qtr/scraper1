@@ -14,9 +14,9 @@ def scrape_data(url):
     rows = table.find_all('tr')
     for row in rows[1:]:  # Exclude the header row
         columns = row.find_all('td')
-        title = columns[3].get_text().strip()
+        title = columns[2].get_text().strip()
         author = columns[1].get_text().strip()
-        year = columns[4].get_text().strip()
+        year = columns[3].get_text().strip()
         data.append({'Title': title, 'Author': author, 'Year': year})
     return data
 
