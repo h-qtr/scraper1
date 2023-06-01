@@ -12,7 +12,7 @@ def scrape_data(url):
     # Extract data from the table
     data = []
     rows = table.find_all('tr')
-    for row in rows[1:]:  # Exclude the header row
+    for row in rows[5:]:  # Exclude the header row
         columns = row.find_all('td')
         title = columns[2].get_text().strip()
         author = columns[1].get_text().strip()
