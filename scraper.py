@@ -2,31 +2,31 @@ import requests
 from bs4 import BeautifulSoup
 import streamlit as st
 
-# Define the URL
-url = "https://libgen.is/search.php?req=islamic&lg_topic=libgen&open=0&view=simple&res=25&phrase=1&column=def"
+def scrape_data(url):
+    # Send a GET request to the URL
+    response = requests.get(url)
+    # Create a BeautifulSoup object with the response content
+    soup = BeautifulSoup(response.content, 'html.parser')
+    # Find the table element with the search results
+    table = soup.find('table', {'class': 'c'})
+    # Extract data from the table
+    data = []
+    rows = table.find_all('tr')
+    for row in rows[1:]:  # Exclude the header row
+        columns = row.find_all('td')
+        title = columns[2].get_text().strip()
+        author = columns[1].get_text().strip()
+        year = columns[3].get_text().strip()
+        data.append({'Title': title, 'Author': author, 'Year': year})
+    return data
 
-# Make a GET request to the URL
-response = requests.get(url)
+# Set up the Streamlit app
+st.title('Web Data Scraper')
+url = 'https://libgen.is/search.php?req=topicid69&open=0&column=topic'
+data = scrape_data(url)
+# Display the scraped data
+if data:
+    st.table(data)
+else:
+    st.write('No data found.')
 
-# Parse the HTML content using BeautifulSoup
-soup = BeautifulSoup(response.content, "html.parser")
-
-# Find all table rows in the HTML
-table_rows = soup.find_all("tr")
-
-# Define a list to store the scraped data
-data = []
-
-# Extract the data from each table row
-for row in table_rows:
-    columns = row.find_all("td")
-    if len(columns) >= 4:
-        book_title = columns[1].text.strip()
-        author = columns[2].text.strip()
-        year = columns[3].text.strip()
-        data.append({"Title": book_title, "Author": author, "Year": year})
-
-# Create a Streamlit app to display the scraped data
-st.title("Web Data Scraper")
-st.header("Scraped Data")
-st.table(data)
